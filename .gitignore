@@ -9,6 +9,11 @@ node_modules/
 *.log
 /tmp/
 
+# SQLite database (runtime data — do not commit)
+data/conversations.db
+data/conversations.db-shm
+data/conversations.db-wal
+
 # macOS
 .DS_Store
 

@@ -2,6 +2,7 @@ const express = require("express");
 const { config } = require("dotenv");
 const path = require("path");
 const { runAgent } = require("./agent");
+const { saveMessage, getHistory, clearHistory, getStats } = require("./db");
 const {
   processPendingSalesforceRecords,
   processMessageAndCreateRecord,
@@ -33,20 +34,32 @@ app.get("/config", (_req, res) => {
 });
 
 // Webhook endpoint for the chat interface to send messages to.
-// 1. Calls the local AI agent to get a real reply.
-// 2. Optionally forwards the agent result to FlowFuse/Node-RED for
-//    downstream processing (Salesforce task creation, logging, etc.).
+// 1. Loads conversation history for this phone number from SQLite.
+// 2. Calls the local AI agent with full context.
+// 3. Saves both the user message and agent reply to SQLite.
+// 4. Optionally forwards the agent result to FlowFuse/Node-RED.
 app.post("/webhook/whatsapp", async (req, res) => {
   try {
     const message = req.body?.Body || req.body?.text || "";
     const from = req.body?.From || req.body?.from || "";
     console.log("/webhook/whatsapp incoming", { from, text: message.slice(0, 200) });
 
-    // ── Step 1: Run the AI agent locally ──────────────────────────
-    const agentResult = await runAgent(message, { from });
+    // ── Step 1: Load conversation history from SQLite ─────────────
+    const HISTORY_TURNS = Number(process.env.HISTORY_TURNS || 10);
+    const history = from ? getHistory(from, HISTORY_TURNS) : [];
+    console.log(`/webhook/whatsapp history for ${from}: ${history.length} turns`);
+
+    // ── Step 2: Run the AI agent with context ─────────────────────
+    const agentResult = await runAgent(message, { from }, history);
     console.log("/webhook/whatsapp agent result", agentResult);
 
-    // ── Step 2: Forward agent result to FlowFuse (fire-and-forget) ─
+    // ── Step 3: Persist both turns to SQLite ──────────────────────
+    if (from) {
+      saveMessage({ phone: from, role: "user",      message });
+      saveMessage({ phone: from, role: "assistant", message: agentResult.reply || "", action: agentResult.action });
+    }
+
+    // ── Step 4: Forward agent result to FlowFuse (fire-and-forget) ─
     const nodeRedUrl = getNodeRedUrl();
     if (nodeRedUrl) {
       try {
@@ -62,19 +75,19 @@ app.post("/webhook/whatsapp", async (req, res) => {
       }
     }
 
-    // ── Step 3: Build a human-friendly reply ─────────────────────
+    // ── Step 5: Build a human-friendly reply ─────────────────────
     let reply = agentResult.reply;
     if (!reply || reply.trim() === "") {
       if (agentResult.action === "create_salesforce_task") {
         const t = agentResult.task || {};
-        reply = `Got it — I've prepared a Salesforce task "${t.subject || "Follow-up"}" (priority: ${t.priority || "Normal"}).`;
-        if (t.dueDate) reply += ` Due date: ${t.dueDate}.`;
+        reply = `Begrepen — ik heb een Salesforce-taak aangemaakt: "${t.subject || "Follow-up"}" (prioriteit: ${t.priority || "Normal"}).`;
+        if (t.dueDate) reply += ` Deadline: ${t.dueDate}.`;
       } else {
-        reply = "I'm not sure how to help with that. Could you rephrase?";
+        reply = "Ik weet het niet zeker. Kunt u uw vraag anders formuleren?";
       }
     }
 
-    // ── Step 4: Return the AI reply immediately ───────────────────
+    // ── Step 6: Return the AI reply immediately ───────────────────
     res.json({
       reply,
       action: agentResult.action || "unknown",
@@ -86,19 +99,26 @@ app.post("/webhook/whatsapp", async (req, res) => {
     res.status(500).json({
       error: "AgentError",
       message: error.message,
-      reply: "Sorry, I encountered an error processing your request."
+      reply: "Sorry, er is een fout opgetreden. Probeer het opnieuw."
     });
   }
 });
 
-// Legacy endpoint for backward compatibility
+// Legacy endpoint for backward compatibility (also passes history)
 app.post("/agent", async (req, res) => {
   try {
     const message = req.body?.text || req.body?.message || "";
     const from = req.body?.from || req.body?.From || "";
     console.log("/agent request", { from, message: message.slice(0, 200) });
 
-    const result = await runAgent(message, { from });
+    const history = from ? getHistory(from, Number(process.env.HISTORY_TURNS || 10)) : [];
+    const result = await runAgent(message, { from }, history);
+
+    if (from) {
+      saveMessage({ phone: from, role: "user",      message });
+      saveMessage({ phone: from, role: "assistant", message: result.reply || "", action: result.action });
+    }
+
     res.json({ ...result, from });
   } catch (error) {
     res.status(500).json({
@@ -106,6 +126,30 @@ app.post("/agent", async (req, res) => {
       message: error.message
     });
   }
+});
+
+// ==================== CONVERSATION HISTORY ====================
+
+// GET /conversation/history?phone=+31612345678  — last N messages
+app.get("/conversation/history", (req, res) => {
+  const phone = req.query.phone;
+  if (!phone) return res.status(400).json({ error: "Missing ?phone= query param" });
+  const limit = Number(req.query.limit || 20);
+  const history = getHistory(phone, limit);
+  res.json({ phone, count: history.length, messages: history });
+});
+
+// DELETE /conversation/reset?phone=+31612345678  — wipe history for a number
+app.delete("/conversation/reset", (req, res) => {
+  const phone = req.query.phone;
+  if (!phone) return res.status(400).json({ error: "Missing ?phone= query param" });
+  clearHistory(phone);
+  res.json({ ok: true, message: `Conversation history cleared for ${phone}` });
+});
+
+// GET /conversation/stats  — aggregate counts across all users
+app.get("/conversation/stats", (_req, res) => {
+  res.json(getStats());
 });
 
 // ==================== SALESFORCE INTEGRATION ====================

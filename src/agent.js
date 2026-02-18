@@ -1,7 +1,6 @@
 const { ChatOpenAI } = require("@langchain/openai");
 const { StructuredOutputParser } = require("langchain/output_parsers");
-const { PromptTemplate } = require("@langchain/core/prompts");
-const { RunnableSequence } = require("@langchain/core/runnables");
+const { HumanMessage, SystemMessage, AIMessage } = require("@langchain/core/messages");
 const { z } = require("zod");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -97,9 +96,11 @@ const faqText = faqCatalog
   })
   .join("\n");
 
-const hrPrompt = PromptTemplate.fromTemplate(
+const SYSTEM_PROMPT = (faq, formatInstructions) =>
 `Je bent een vriendelijke HR-assistent voor WhatsApp-gesprekken van Staffable.
 Je communiceert altijd formeel (u/uw) in het Nederlands, tenzij de vraag in het Engels is gesteld — dan antwoord je in het Engels.
+
+Je hebt toegang tot de gespreksgeschiedenis van deze medewerker. Gebruik die context om doorverwijzingen ("dat", "het", "eerder") te begrijpen en persoonlijke vervolgvragen te beantwoorden.
 
 ═══════════════════════════════════════
 STAP 1 — BEPAAL OF DE VRAAG HR-GERELATEERD IS
@@ -129,23 +130,18 @@ Prioriteit:
    iemand onboarden, taak aanmaken, afspraak inplannen) → gebruik "create_salesforce_task"
 
 FAQ-lijst (altijd als eerste bron raadplegen):
-{faq}
+${faq}
 
 ═══════════════════════════════════════
 STAP 3 — ACTIES
 ═══════════════════════════════════════
-• "answer_faq"           → vraag beantwoord (uit FAQ of algemene HR-kennis)
+• "answer_faq"             → vraag beantwoord (uit FAQ of algemene HR-kennis)
 • "create_salesforce_task" → actie/taak vereist bij HR
-• "no_action"            → vraag niet HR-gerelateerd; vriendelijk afwijzen
+• "no_action"              → vraag niet HR-gerelateerd; vriendelijk afwijzen
 
 Bij "create_salesforce_task" vul je ook het task-object in (subject, description, priority, dueDate als opgegeven).
 
-{format_instructions}
-
-Bericht van medewerker: {message}
-Metadata: {metadata}
-`
-);
+${formatInstructions}`;
 
 const fallbackKeywordIntent = (message) => {
   const normalized = message.toLowerCase();
@@ -199,11 +195,19 @@ const fallbackKeywordIntent = (message) => {
   };
 };
 
-async function runAgent(message, metadata = {}) {
+/**
+ * Run the HR agent.
+ * @param {string} message - the current user message
+ * @param {object} metadata - extra context (from phone number, etc.)
+ * @param {{ role: 'user'|'assistant', content: string }[]} [history=[]]
+ *   Previous messages for this phone number, oldest first.
+ *   Pass the result of db.getHistory(phone) here.
+ */
+async function runAgent(message, metadata = {}, history = []) {
   if (!message || !message.trim()) {
     return {
       action: "no_action",
-      reply: "Please share your HR question and I can help.",
+      reply: "Stel gerust uw HR-vraag, ik help u graag.",
       task: {}
     };
   }
@@ -217,18 +221,42 @@ async function runAgent(message, metadata = {}) {
     temperature: 0.2
   });
 
-  const chain = RunnableSequence.from([
-    hrPrompt,
-    llm,
-    parser
-  ]);
+  // Build the messages array:
+  //   [SystemMessage, ...history as Human/AI turns, HumanMessage (current)]
+  const messages = [
+    new SystemMessage(SYSTEM_PROMPT(faqText, parser.getFormatInstructions()))
+  ];
 
-  const result = await chain.invoke({
-    message,
-    metadata: JSON.stringify(metadata),
-    faq: faqText,
-    format_instructions: parser.getFormatInstructions()
-  });
+  // Inject previous turns so the LLM has full context
+  for (const turn of history) {
+    if (turn.role === "user") {
+      messages.push(new HumanMessage(turn.content));
+    } else {
+      messages.push(new AIMessage(turn.content));
+    }
+  }
+
+  // Add the current message
+  messages.push(new HumanMessage(message));
+
+  const response = await llm.invoke(messages);
+  let result;
+
+  try {
+    result = await parser.parse(response.content);
+  } catch (_parseErr) {
+    // LLM replied in plain text instead of JSON (common when history is present).
+    // Re-ask with an explicit JSON-only instruction.
+    const retryMessages = [
+      ...messages,
+      new AIMessage(response.content),
+      new HumanMessage(
+        `Geef nu uw antwoord opnieuw, maar uitsluitend als geldig JSON-object dat voldoet aan dit schema:\n${parser.getFormatInstructions()}\n\nGeef alleen het JSON-object terug, geen extra uitleg.`
+      )
+    ];
+    const retryResponse = await llm.invoke(retryMessages);
+    result = await parser.parse(retryResponse.content);
+  }
 
   // Ensure task is always an object, never null
   return {
