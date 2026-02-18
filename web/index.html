@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Local WhatsApp HR Chat</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+        background: #f3f4f6;
+      }
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        padding: 32px 16px;
+      }
+      .app {
+        width: min(900px, 100%);
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 0;
+        overflow: hidden;
+      }
+      .chat {
+        padding: 24px;
+        background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 55%);
+      }
+      .chat h1 {
+        margin: 0 0 8px 0;
+        font-size: 20px;
+      }
+      .chat p {
+        margin: 0 0 20px 0;
+        color: #475569;
+      }
+      .messages {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 520px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+      .bubble {
+        max-width: 75%;
+        padding: 12px 14px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+      .bubble.user {
+        align-self: flex-end;
+        background: #dcfce7;
+        border-bottom-right-radius: 4px;
+      }
+      .bubble.agent {
+        align-self: flex-start;
+        background: #e2e8f0;
+        border-bottom-left-radius: 4px;
+      }
+      .meta {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 4px;
+      }
+      .panel {
+        padding: 24px;
+        border-left: 1px solid #e2e8f0;
+        background: #f8fafc;
+      }
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #e2e8f0;
+        color: #1e293b;
+        margin-bottom: 12px;
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #94a3b8;
+      }
+      .status-chip.ok {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .status-chip.ok .status-dot {
+        background: #22c55e;
+      }
+      .status-chip.warn {
+        background: #fef9c3;
+        color: #854d0e;
+      }
+      .status-chip.warn .status-dot {
+        background: #facc15;
+      }
+      .status-chip.error {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .status-chip.error .status-dot {
+        background: #ef4444;
+      }
+      .tabs {
+        display: inline-flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        background: #e2e8f0;
+        border-radius: 999px;
+        padding: 4px;
+      }
+      .tab {
+        border: none;
+        background: transparent;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #475569;
+        cursor: pointer;
+      }
+      .tab.active {
+        background: #ffffff;
+        color: #0f172a;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      .debug-grid {
+        display: grid;
+        gap: 12px;
+      }
+      .debug-block {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 12px;
+        color: #475569;
+      }
+      label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #475569;
+        display: block;
+        margin-bottom: 6px;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        border: 1px solid #cbd5f5;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
+        margin-bottom: 14px;
+        background: #ffffff;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+      button {
+        width: 100%;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 14px;
+        background: #16a34a;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .status {
+        margin-top: 12px;
+        font-size: 12px;
+        color: #64748b;
+      }
+      .config {
+        font-size: 12px;
+        color: #64748b;
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 12px;
+      }
+      @media (max-width: 860px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .panel {
+          border-left: none;
+          border-top: 1px solid #e2e8f0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <section class="chat">
+        <h1>Local WhatsApp HR Chat</h1>
+        <p>Send test messages and see the HR agent reply as if it were WhatsApp.</p>
+        <div class="messages" id="messages"></div>
+      </section>
+      <aside class="panel">
+        <div class="tabs" role="tablist" aria-label="Chat tabs">
+          <button class="tab active" data-tab="controls" type="button">Chat</button>
+          <button class="tab" data-tab="debug" type="button">Debug</button>
+        </div>
+
+        <div id="tab-controls" class="tab-content active">
+          <div class="status-chip" id="connectionStatus">
+            <span class="status-dot"></span>
+            <span id="connectionText">Checking connection...</span>
+          </div>
+          <label for="from">Sender (WhatsApp From)</label>
+          <input id="from" placeholder="+15551234567" value="+15551234567" />
+
+          <label for="webhook">Node-RED webhook URL</label>
+          <input
+            id="webhook"
+            value="http://localhost:1880/webhook/whatsapp"
+          />
+
+          <label for="message">Message</label>
+          <textarea id="message" placeholder="Ask about PTO, benefits, or request a follow-up."></textarea>
+
+          <button id="send">Send</button>
+          <div class="status" id="status">Ready to send.</div>
+
+          <div class="config" style="margin-top: 18px;">
+            <strong>Payload sent</strong>
+            <pre id="payloadPreview"></pre>
+          </div>
+        </div>
+
+        <div id="tab-debug" class="tab-content">
+          <div class="debug-grid">
+            <div class="debug-block">
+              <strong>Last agent response</strong>
+              <pre id="responsePreview">No response yet.</pre>
+            </div>
+            <div class="debug-block">
+              <strong>Webhook URL</strong>
+              <div id="webhookPreview">http://localhost:1880/webhook/whatsapp</div>
+            </div>
+            <div class="debug-block">
+              <strong>Node-RED target</strong>
+              <div id="nodeRedTarget">Not loaded yet.</div>
+            </div>
+            <div class="debug-block">
+              <strong>Connection checks</strong>
+              <pre id="connectionDetails">Not checked yet.</pre>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <script>
+      const messages = document.getElementById("messages");
+      const fromInput = document.getElementById("from");
+      const webhookInput = document.getElementById("webhook");
+      const messageInput = document.getElementById("message");
+      const sendButton = document.getElementById("send");
+      const statusEl = document.getElementById("status");
+      const payloadPreview = document.getElementById("payloadPreview");
+  const responsePreview = document.getElementById("responsePreview");
+  const webhookPreview = document.getElementById("webhookPreview");
+  const nodeRedTarget = document.getElementById("nodeRedTarget");
+  const connectionStatus = document.getElementById("connectionStatus");
+  const connectionText = document.getElementById("connectionText");
+  const connectionDetails = document.getElementById("connectionDetails");
+  const tabs = document.querySelectorAll(".tab");
+  const tabContents = document.querySelectorAll(".tab-content");
+
+      function addBubble(text, type) {
+        const bubble = document.createElement("div");
+        bubble.className = `bubble ${type}`;
+        bubble.textContent = text;
+        messages.appendChild(bubble);
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      function setStatus(text, isError = false) {
+        statusEl.textContent = text;
+        statusEl.style.color = isError ? "#dc2626" : "#64748b";
+      }
+
+      function setConnectionState(state, text, details) {
+        connectionStatus.classList.remove("ok", "warn", "error");
+        connectionStatus.classList.add(state);
+        connectionText.textContent = text;
+        connectionDetails.textContent = details;
+      }
+
+      async function checkConnection() {
+        const diagnostics = [];
+        let agentOk = false;
+        let nodeRedOk = false;
+
+        try {
+          const response = await fetch("/health");
+          agentOk = response.ok;
+          diagnostics.push(`Agent service: ${response.ok ? "OK" : "Unavailable"}`);
+        } catch (_error) {
+          diagnostics.push("Agent service: Unreachable");
+        }
+
+        try {
+          const response = await fetch("/config");
+          if (response.ok) {
+            const config = await response.json();
+            nodeRedTarget.textContent = config.nodeRedTarget || "Not set";
+            diagnostics.push(`Node-RED target: ${config.nodeRedTarget || "Not set"}`);
+          } else {
+            diagnostics.push("Node-RED target: Unavailable");
+          }
+        } catch (_error) {
+          diagnostics.push("Node-RED target: Unreachable");
+        }
+
+        try {
+          const response = await fetch(webhookInput.value, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ Body: "connection-check", From: "+10000000000" })
+          });
+          nodeRedOk = response.ok;
+          diagnostics.push(`Flow round-trip: ${response.ok ? "OK" : "Failed"}`);
+        } catch (_error) {
+          diagnostics.push("Flow round-trip: Failed");
+        }
+
+        if (agentOk && nodeRedOk) {
+          setConnectionState("ok", "Connected", diagnostics.join("\n"));
+        } else if (agentOk) {
+          setConnectionState("warn", "Agent OK, Flow not reachable", diagnostics.join("\n"));
+        } else {
+          setConnectionState("error", "Agent offline", diagnostics.join("\n"));
+        }
+      }
+
+      async function loadConfig() {
+        try {
+          const response = await fetch("/config");
+          if (!response.ok) {
+            throw new Error("Config fetch failed");
+          }
+          const config = await response.json();
+          if (config.webhookUrl) {
+            webhookInput.value = config.webhookUrl;
+            webhookPreview.textContent = config.webhookUrl;
+          }
+          if (config.nodeRedTarget) {
+            nodeRedTarget.textContent = config.nodeRedTarget;
+          }
+        } catch (error) {
+          nodeRedTarget.textContent = "Config unavailable";
+        }
+      }
+
+      async function sendMessage() {
+        const text = messageInput.value.trim();
+        if (!text) {
+          setStatus("Type a message before sending.", true);
+          return;
+        }
+
+        const payload = {
+          Body: text,
+          From: fromInput.value.trim() || "+15550000000"
+        };
+
+        payloadPreview.textContent = JSON.stringify(payload, null, 2);
+        webhookPreview.textContent = webhookInput.value;
+        addBubble(text, "user");
+        messageInput.value = "";
+        sendButton.disabled = true;
+        setStatus("Sending...");
+
+        try {
+          const response = await fetch(webhookInput.value, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json();
+          const reply = data.payload?.reply || data.reply || "No reply received.";
+          addBubble(reply, "agent");
+          responsePreview.textContent = JSON.stringify(data, null, 2);
+          setStatus("Response received.");
+        } catch (error) {
+          addBubble("Could not reach Node-RED. Check the webhook URL.", "agent");
+          responsePreview.textContent = JSON.stringify({ error: error.message }, null, 2);
+          setStatus(error.message, true);
+        } finally {
+          sendButton.disabled = false;
+        }
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const target = tab.dataset.tab;
+          tabs.forEach((item) => item.classList.remove("active"));
+          tabContents.forEach((item) => item.classList.remove("active"));
+          tab.classList.add("active");
+          document.getElementById(`tab-${target}`).classList.add("active");
+        });
+      });
+
+      sendButton.addEventListener("click", sendMessage);
+      messageInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+          sendMessage();
+        }
+      });
+
+      setStatus("Ready to send.");
+      loadConfig();
+      checkConnection();
+    </script>
+  </body>
+</html>
