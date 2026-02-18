@@ -1,0 +1,87 @@
+[
+  {
+    "question": "Wanneer krijg ik uitbetaald?",
+    "keywords": ["betaald", "salaris", "loon", "betaling", "uitbetaald", "loondag"],
+    "answer": "De betaaldatum hangt af van jouw contract:\n• Flexmedewerkers (maandelijks): verschillende datums per maand (bv. 12 januari, 12 februari, etc.)\n• Vaste uren: uiterlijk op de 25e van de lopende maand\n• Wekelijks betaald: elke woensdag\nReiskosten en overuren worden maand achteraf uitbetaald."
+  },
+  {
+    "question": "Wanneer komt mijn loonstrook?",
+    "keywords": ["loonstrook", "salarisstaat", "loon", "strook"],
+    "answer": "De loonstrook is beschikbaar in de app op de dag van de betaling. Bij wekelijkse betaling is de loonstrook aan het einde van woensdag beschikbaar. Bij maandelijkse betaling krijg je de loonstrook ook op de betaaldag."
+  },
+  {
+    "question": "Wanneer komt mijn jaaropgaaf?",
+    "keywords": ["jaaropgaaf", "jaar", "opgaaf", "jaardocument"],
+    "answer": "De jaaropgaaf wordt in februari van het nieuwe jaar beschikbaar gesteld."
+  },
+  {
+    "question": "Waar vind ik mijn loonstrook?",
+    "keywords": ["loonstrook", "vinden", "app", "document", "tigris"],
+    "answer": "Je kunt je loonstrook vinden in de Tigris app onder het kopje 'loonstroken'."
+  },
+  {
+    "question": "Wat is de Tigris app?",
+    "keywords": ["tigris", "app", "document", "loonstrook", "contract"],
+    "answer": "De Tigris Werk & Vacatures app geeft je inzicht in al jouw documenten zoals loonstroken, jouw contract en de jaaropgaaf. Je kunt deze app downloaden in de App Store of Google Play Store."
+  },
+  {
+    "question": "Waarom betaal ik loonheffing?",
+    "keywords": ["loonheffing", "heffing", "belasting", "voorheffing", "belastingdienst"],
+    "answer": "In Nederland betalen we loonheffing om publieke voorzieningen te bekostigen. Dit is een voorheffing op de inkomstenbelasting. Als werkgever zorgen wij ervoor dat alles netjes wordt afgedragen aan de Belastingdienst."
+  },
+  {
+    "question": "Wanneer krijg ik mijn contract?",
+    "keywords": ["contract", "arbeidsovereenkomst", "ontvangen", "ondertekenen"],
+    "answer": "Zodra je alle gegevens compleet hebt aangeleverd, ontvang je binnen 2 werkdagen jouw arbeidsovereenkomst via email. Volg de stappen en onderteken de overeenkomst zodat we kunnen zorgen voor tijdige salarisbetaling."
+  },
+  {
+    "question": "Hoe kan ik me ziek melden?",
+    "keywords": ["ziek", "ziekmelden", "ziekte", "ziekmelding", "telefoon"],
+    "answer": "Je dient je ziek te melden bij jouw opdrachtgever EN telefonisch bij Staffable op +31 (0)43 205 10 01 vóór 10:00 uur. Dit moet onmiddellijk gebeuren. Vergeet je opdrachtgever niet ook te contacteren."
+  },
+  {
+    "question": "Wanneer moet ik mij beter melden?",
+    "keywords": ["beter", "betermelden", "weer werken", "hersteld"],
+    "answer": "Wanneer je weer beter bent en kunt werken, meld je dit telefonisch bij Staffable via +31 (0)43 205 10 01. Vergeet ook je opdrachtgever niet te contacteren."
+  },
+  {
+    "question": "Wanneer krijg ik mijn vakantiegeld uitbetaald?",
+    "keywords": ["vakantiegeld", "vakantie", "geld", "betaling"],
+    "answer": "• Oproepkrachten: twee keer per jaar (juni 7e-12e en december 7e-12e), tenzij je wekelijks salaris ontvangt\n• Vaste uren: twee keer per jaar (mei en november)"
+  },
+  {
+    "question": "Hoe moet ik mijn vakantiedagen doorgeven?",
+    "keywords": ["vakantie", "vakantiedagen", "opnemen", "doorsturen", "aanvragen"],
+    "answer": "Bespreek je vakantiedagen voorafgaand met je opdrachtgever. Wanneer je opdrachtgever akkoord is, mail je de datum en aantal uren naar support@staffable.com."
+  },
+  {
+    "question": "Heb ik recht op reiskostenvergoeding?",
+    "keywords": ["reiskosten", "vergoeding", "reis", "kosten"],
+    "answer": "Dit hangt af van de afspraken die je maakt met je opdrachtgever waarvoor je gaat werken."
+  },
+  {
+    "question": "Loonheffingskorting wijzigen",
+    "keywords": ["loonheffingskorting", "wijzigen", "korting"],
+    "answer": "Dit is een onderwerp dat een taak richting HR vereist. Neem contact op via support@staffable.com of bel +31 (0)43 205 10 01."
+  },
+  {
+    "question": "Wijziging adres / IBAN",
+    "keywords": ["adres", "iban", "wijziging", "bankrekening", "wonen"],
+    "answer": "Dit is een onderwerp dat een taak richting HR vereist. Neem contact op via support@staffable.com of bel +31 (0)43 205 10 01."
+  },
+  {
+    "question": "Uitschrijven medewerkers",
+    "keywords": ["uitschrijven", "vertrek", "beëindigen", "contract"],
+    "answer": "Dit is een onderwerp dat een taak richting HR vereist. Neem contact op via support@staffable.com of bel +31 (0)43 205 10 01."
+  },
+  {
+    "question": "Hoe zie ik dat de medewerker de stappen doorlopen heeft?",
+    "keywords": ["status", "inschrijving", "stappen", "doorlopen", "opdrachtnemers"],
+    "answer": "Ingelogd bij ons systeem vind je onder de status de huidige status van de inschrijving van je opdrachtnemers."
+  },
+  {
+    "question": "Wanneer moeten de uren worden doorgegeven?",
+    "keywords": ["uren", "doorgeven", "timesheet", "rapporteren"],
+    "answer": "De uren moeten worden doorgegeven op de 4e van de maand om 18:00, zodat we kunnen zorgen voor een tijdige betaling richting de medewerker."
+  }
+]
