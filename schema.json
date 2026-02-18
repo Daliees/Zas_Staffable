@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Staff Data Schema",
+  "description": "Schema for staff/employee data in Zas_Staffable system",
+  "type": "object",
+  "properties": {
+    "staff": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the staff member"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the staff member"
+          },
+          "position": {
+            "type": "string",
+            "description": "Job position/title"
+          },
+          "department": {
+            "type": "string",
+            "description": "Department name"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address"
+          },
+          "hired_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of hire in YYYY-MM-DD format"
+          }
+        },
+        "required": ["id", "name", "position", "department", "email"]
+      }
+    }
+  },
+  "required": ["staff"]
+}
