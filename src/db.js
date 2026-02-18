@@ -72,6 +72,17 @@ const stmtStats = db.prepare(`
   FROM conversations
 `);
 
+// Returns one row per unique phone with message count and last activity
+const stmtUsers = db.prepare(`
+  SELECT
+    phone,
+    COUNT(*)     AS message_count,
+    MAX(created_at) AS last_at
+  FROM conversations
+  GROUP BY phone
+  ORDER BY last_at DESC
+`);
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
@@ -119,4 +130,12 @@ function getStats() {
   return stmtStats.get();
 }
 
-module.exports = { db, saveMessage, getHistory, clearHistory, getStats };
+/**
+ * Return one row per unique phone number with message count and last activity.
+ * @returns {{ phone: string, message_count: number, last_at: string }[]}
+ */
+function getUsers() {
+  return stmtUsers.all();
+}
+
+module.exports = { db, saveMessage, getHistory, clearHistory, getStats, getUsers };

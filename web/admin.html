@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Staffable HR Agent — Admin</title>
+    <style>
+      :root {
+        font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+        background: #f3f4f6;
+        color: #0f172a;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      /* ── Layout ── */
+      body { display: flex; flex-direction: column; min-height: 100vh; }
+
+      header {
+        background: #16a34a;
+        color: #fff;
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.15);
+      }
+      header h1 { font-size: 18px; font-weight: 700; flex: 1; }
+      header a {
+        color: rgba(255,255,255,.85);
+        text-decoration: none;
+        font-size: 13px;
+        padding: 6px 12px;
+        border: 1px solid rgba(255,255,255,.4);
+        border-radius: 6px;
+      }
+      header a:hover { background: rgba(255,255,255,.15); }
+
+      main { flex: 1; padding: 28px; max-width: 1400px; width: 100%; margin: 0 auto; }
+
+      /* ── Stat cards ── */
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+      .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      }
+      .stat-card .label { font-size: 12px; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .05em; }
+      .stat-card .value { font-size: 28px; font-weight: 700; color: #16a34a; }
+      .stat-card .sub   { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+
+      /* ── Controls bar ── */
+      .controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        background: #fff;
+        padding: 14px 18px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      }
+      .controls label { font-size: 13px; color: #475569; white-space: nowrap; }
+      .controls input, .controls select {
+        padding: 7px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 13px;
+        outline: none;
+        flex: 1;
+        min-width: 160px;
+      }
+      .controls input:focus, .controls select:focus { border-color: #16a34a; }
+      .controls button {
+        padding: 7px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .btn-primary   { background: #16a34a; color: #fff; }
+      .btn-primary:hover { background: #15803d; }
+      .btn-danger    { background: #fee2e2; color: #dc2626; }
+      .btn-danger:hover  { background: #fecaca; }
+      .btn-secondary { background: #f1f5f9; color: #475569; }
+      .btn-secondary:hover { background: #e2e8f0; }
+
+      /* ── User list panel ── */
+      .layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; }
+      @media (max-width: 700px) { .layout { grid-template-columns: 1fr; } }
+
+      .user-panel {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.07);
+        overflow: hidden;
+        align-self: start;
+      }
+      .user-panel h2 {
+        font-size: 13px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+      }
+      .user-list { max-height: 520px; overflow-y: auto; }
+      .user-item {
+        padding: 12px 16px;
+        cursor: pointer;
+        border-bottom: 1px solid #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        transition: background .1s;
+      }
+      .user-item:hover    { background: #f0fdf4; }
+      .user-item.active   { background: #dcfce7; border-left: 3px solid #16a34a; }
+      .user-item .phone   { font-size: 13px; font-weight: 600; }
+      .user-item .meta    { font-size: 11px; color: #94a3b8; }
+
+      /* ── Conversation panel ── */
+      .convo-panel {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.07);
+        display: flex;
+        flex-direction: column;
+        min-height: 400px;
+      }
+      .convo-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .convo-header h2 { font-size: 14px; flex: 1; color: #0f172a; }
+      .convo-body { flex: 1; overflow-y: auto; padding: 18px; max-height: 520px; }
+      .convo-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+        color: #94a3b8;
+        font-size: 14px;
+      }
+
+      /* ── Message bubbles ── */
+      .msg-row { display: flex; gap: 10px; margin-bottom: 14px; align-items: flex-start; }
+      .msg-row.user      { flex-direction: row-reverse; }
+      .avatar {
+        width: 30px; height: 30px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; font-weight: 700; flex-shrink: 0;
+      }
+      .avatar.user      { background: #dcfce7; color: #16a34a; }
+      .avatar.assistant { background: #eff6ff; color: #3b82f6; }
+      .bubble {
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .bubble.user      { background: #dcfce7; border-bottom-right-radius: 4px; }
+      .bubble.assistant { background: #f1f5f9; border-bottom-left-radius: 4px; }
+      .bubble .ts    { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+      .badge {
+        display: inline-block;
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        font-weight: 600;
+        margin-top: 4px;
+      }
+      .badge.answer_faq           { background: #dcfce7; color: #16a34a; }
+      .badge.create_salesforce_task { background: #eff6ff; color: #3b82f6; }
+      .badge.no_action            { background: #fef3c7; color: #d97706; }
+
+      /* ── Toast ── */
+      #toast {
+        position: fixed; bottom: 24px; right: 24px;
+        background: #0f172a; color: #fff;
+        padding: 10px 18px; border-radius: 8px;
+        font-size: 13px; opacity: 0;
+        transition: opacity .25s;
+        pointer-events: none;
+        z-index: 999;
+      }
+      #toast.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <h1>Staffable HR Agent — Admin</h1>
+      <a href="/local.html">💬 Emulator</a>
+    </header>
+
+    <main>
+      <!-- Stat cards -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="label">Totaal berichten</div>
+          <div class="value" id="statTotal">—</div>
+          <div class="sub">all time</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Unieke gebruikers</div>
+          <div class="value" id="statUsers">—</div>
+          <div class="sub">phone numbers</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Vragen gesteld</div>
+          <div class="value" id="statUserMsgs">—</div>
+          <div class="sub">user messages</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Laatste activiteit</div>
+          <div class="value" id="statLast" style="font-size:14px;padding-top:4px">—</div>
+          <div class="sub" id="statLastSub"></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <label>Filter op nummer:</label>
+        <input id="filterPhone" type="text" placeholder="+316…" />
+        <button class="btn-primary" onclick="applyFilter()">🔍 Zoeken</button>
+        <button class="btn-secondary" onclick="clearFilter()">✕ Reset</button>
+        <div style="flex:1"></div>
+        <button class="btn-secondary" onclick="loadAll()">↻ Vernieuwen</button>
+      </div>
+
+      <!-- Two-column layout -->
+      <div class="layout">
+        <!-- User list -->
+        <div class="user-panel">
+          <h2>Gebruikers</h2>
+          <div class="user-list" id="userList">
+            <div class="convo-empty">Laden…</div>
+          </div>
+        </div>
+
+        <!-- Conversation viewer -->
+        <div class="convo-panel">
+          <div class="convo-header">
+            <h2 id="convoTitle">Selecteer een gebruiker</h2>
+            <button class="btn-danger" id="clearBtn" style="display:none" onclick="clearConvo()">🗑 Wis gesprek</button>
+          </div>
+          <div class="convo-body" id="convoBody">
+            <div class="convo-empty">👈 Kies een gebruiker uit de lijst</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="toast"></div>
+
+    <script>
+      // ── State ─────────────────────────────────────────────────────
+      let allUsers   = [];   // [{ phone, count, last }]
+      let activePhone = null;
+
+      // ── Boot ──────────────────────────────────────────────────────
+      loadAll();
+      setInterval(loadAll, 15000); // auto-refresh every 15 s
+
+      async function loadAll() {
+        await Promise.all([loadStats(), loadUsers()]);
+      }
+
+      // ── Stats ─────────────────────────────────────────────────────
+      async function loadStats() {
+        try {
+          const d = await fetchJSON('/conversation/stats');
+          document.getElementById('statTotal').textContent     = d.total_messages ?? '—';
+          document.getElementById('statUsers').textContent     = d.unique_users ?? '—';
+          document.getElementById('statUserMsgs').textContent  = d.user_messages ?? '—';
+          if (d.last_activity) {
+            const dt = new Date(d.last_activity);
+            document.getElementById('statLast').textContent    = dt.toLocaleTimeString('nl-NL', { hour:'2-digit', minute:'2-digit' });
+            document.getElementById('statLastSub').textContent = dt.toLocaleDateString('nl-NL');
+          }
+        } catch(e) { console.error('stats error', e); }
+      }
+
+      // ── User list — built from history endpoint per known phone ───
+      // We query /conversation/stats for counts and derive users from
+      // individual history calls seeded by fetching all phones via a
+      // small internal helper endpoint we add below.
+      async function loadUsers() {
+        try {
+          const d = await fetchJSON('/conversation/users');
+          allUsers = d.users || [];
+          renderUserList(allUsers);
+        } catch(e) {
+          // Fallback: show empty state
+          document.getElementById('userList').innerHTML =
+            '<div class="convo-empty" style="padding:20px">Geen gebruikers gevonden</div>';
+        }
+      }
+
+      function renderUserList(users) {
+        const filter = document.getElementById('filterPhone').value.trim().toLowerCase();
+        const list   = filter ? users.filter(u => u.phone.toLowerCase().includes(filter)) : users;
+
+        if (!list.length) {
+          document.getElementById('userList').innerHTML =
+            '<div class="convo-empty" style="padding:20px">Geen resultaten</div>';
+          return;
+        }
+
+        document.getElementById('userList').innerHTML = list.map(u => `
+          <div class="user-item ${u.phone === activePhone ? 'active' : ''}"
+               onclick="selectUser('${u.phone}')">
+            <div class="phone">${u.phone}</div>
+            <div class="meta">${u.message_count} berichten · ${relTime(u.last_at)}</div>
+          </div>
+        `).join('');
+      }
+
+      // ── Conversation viewer ───────────────────────────────────────
+      async function selectUser(phone) {
+        activePhone = phone;
+        renderUserList(allUsers);
+        document.getElementById('convoTitle').textContent = phone;
+        document.getElementById('clearBtn').style.display = 'inline-block';
+        document.getElementById('convoBody').innerHTML    = '<div class="convo-empty">Laden…</div>';
+
+        try {
+          const d = await fetchJSON(`/conversation/history?phone=${encodeURIComponent(phone)}&limit=100`);
+          renderConvo(d.messages || []);
+        } catch(e) {
+          document.getElementById('convoBody').innerHTML =
+            '<div class="convo-empty">Fout bij laden</div>';
+        }
+      }
+
+      function renderConvo(messages) {
+        if (!messages.length) {
+          document.getElementById('convoBody').innerHTML =
+            '<div class="convo-empty">Geen berichten</div>';
+          return;
+        }
+
+        document.getElementById('convoBody').innerHTML = messages.map(m => {
+          const isUser = m.role === 'user';
+          const initials = isUser ? 'G' : 'AI';
+          const ts = m.created_at ? new Date(m.created_at).toLocaleString('nl-NL') : '';
+          const badge = (!isUser && m.action)
+            ? `<div><span class="badge ${m.action}">${m.action}</span></div>` : '';
+
+          return `
+            <div class="msg-row ${m.role}">
+              <div class="avatar ${m.role}">${initials}</div>
+              <div class="bubble ${m.role}">
+                ${escHtml(m.content)}
+                ${badge}
+                <div class="ts">${ts}</div>
+              </div>
+            </div>`;
+        }).join('');
+
+        // Scroll to bottom
+        const body = document.getElementById('convoBody');
+        body.scrollTop = body.scrollHeight;
+      }
+
+      // ── Clear conversation ────────────────────────────────────────
+      async function clearConvo() {
+        if (!activePhone) return;
+        if (!confirm(`Weet u zeker dat u het gesprek met ${activePhone} wilt wissen?`)) return;
+        try {
+          await fetch(`/conversation/reset?phone=${encodeURIComponent(activePhone)}`, { method: 'DELETE' });
+          toast('Gesprek gewist ✓');
+          activePhone = null;
+          document.getElementById('convoTitle').textContent   = 'Selecteer een gebruiker';
+          document.getElementById('clearBtn').style.display   = 'none';
+          document.getElementById('convoBody').innerHTML      =
+            '<div class="convo-empty">👈 Kies een gebruiker uit de lijst</div>';
+          await loadAll();
+        } catch(e) { toast('Fout bij wissen', true); }
+      }
+
+      // ── Filter ────────────────────────────────────────────────────
+      function applyFilter() { renderUserList(allUsers); }
+      function clearFilter()  {
+        document.getElementById('filterPhone').value = '';
+        renderUserList(allUsers);
+      }
+
+      // ── Helpers ───────────────────────────────────────────────────
+      async function fetchJSON(url) {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      }
+
+      function escHtml(str = '') {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                  .replace(/\n/g,'<br>');
+      }
+
+      function relTime(iso) {
+        if (!iso) return '';
+        const diff = Date.now() - new Date(iso).getTime();
+        const m = Math.floor(diff / 60000);
+        if (m < 1)  return 'zojuist';
+        if (m < 60) return `${m} min geleden`;
+        const h = Math.floor(m / 60);
+        if (h < 24) return `${h} uur geleden`;
+        return `${Math.floor(h/24)} dag(en) geleden`;
+      }
+
+      function toast(msg, err = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.style.background = err ? '#dc2626' : '#0f172a';
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 2800);
+      }
+
+      // Enter key in filter input
+      document.getElementById('filterPhone')
+        .addEventListener('keydown', e => e.key === 'Enter' && applyFilter());
+    </script>
+  </body>
+</html>

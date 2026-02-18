@@ -2,7 +2,7 @@ const express = require("express");
 const { config } = require("dotenv");
 const path = require("path");
 const { runAgent } = require("./agent");
-const { saveMessage, getHistory, clearHistory, getStats } = require("./db");
+const { saveMessage, getHistory, clearHistory, getStats, getUsers } = require("./db");
 const {
   processPendingSalesforceRecords,
   processMessageAndCreateRecord,
@@ -130,6 +130,11 @@ app.post("/agent", async (req, res) => {
 
 // ==================== CONVERSATION HISTORY ====================
 
+// GET /conversation/users  — list all users with message counts
+app.get("/conversation/users", (_req, res) => {
+  res.json({ users: getUsers() });
+});
+
 // GET /conversation/history?phone=+31612345678  — last N messages
 app.get("/conversation/history", (req, res) => {
   const phone = req.query.phone;
@@ -224,6 +229,7 @@ app.post("/salesforce/process-pending", async (req, res) => {
 const port = Number(process.env.AGENT_PORT || 4001);
 app.listen(port, () => {
   console.log(`Agent service listening on http://localhost:${port}`);
-  console.log(`Chat interface available at http://localhost:${port}/local.html`);
-  console.log(`Salesforce health check: http://localhost:${port}/salesforce/health`);
+  console.log(`Chat emulator available at http://localhost:${port}/local.html`);
+  console.log(`Admin dashboard    at http://localhost:${port}/admin.html`);
+  console.log(`Salesforce health  at http://localhost:${port}/salesforce/health`);
 });
