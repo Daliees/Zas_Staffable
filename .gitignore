@@ -1,0 +1,16 @@
+node_modules/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Runtime logs
+*.log
+/tmp/
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/settings.json
