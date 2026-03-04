@@ -114,10 +114,8 @@ app.post("/agent", async (req, res) => {
     const history = from ? getHistory(from, Number(process.env.HISTORY_TURNS || 10)) : [];
     const result = await runAgent(message, { from }, history);
 
-    if (from) {
-      saveMessage({ phone: from, role: "user",      message });
-      saveMessage({ phone: from, role: "assistant", message: result.reply || "", action: result.action });
-    }
+    // NOTE: do NOT save here — /webhook/whatsapp already saved both turns
+    // before forwarding to FlowFuse. Saving here would cause duplicates.
 
     res.json({ ...result, from });
   } catch (error) {
