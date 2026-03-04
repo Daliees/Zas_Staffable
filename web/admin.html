@@ -5,276 +5,296 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Staffable HR Agent — Admin</title>
     <style>
-      /* ── Theme tokens ── */
-      :root {
-        --bg-page:    #f3f4f6;
-        --bg-card:    #ffffff;
-        --bg-input:   #ffffff;
-        --bg-hover:   #f0fdf4;
-        --bg-active:  #dcfce7;
-        --border:     #e2e8f0;
-        --border-sub: #f1f5f9;
-        --text:       #0f172a;
-        --text-muted: #64748b;
-        --text-faint: #94a3b8;
-        --shadow:     rgba(0,0,0,.07);
-        --bubble-user: #dcfce7;
-        --bubble-ai:   #f1f5f9;
-        --avatar-user-bg: #dcfce7; --avatar-user-fg: #16a34a;
-        --avatar-ai-bg:   #eff6ff; --avatar-ai-fg:   #3b82f6;
-        --btn-sec-bg: #f1f5f9; --btn-sec-fg: #475569;
-        --btn-sec-hover: #e2e8f0;
-        --btn-danger-bg: #fee2e2; --btn-danger-fg: #dc2626;
-        --btn-danger-hover: #fecaca;
-        --toast-bg: #0f172a;
-        font-family: "Inter", "Segoe UI", system-ui, sans-serif;
-      }
-      [data-theme="dark"] {
-        --bg-page:    #0f172a;
-        --bg-card:    #1e293b;
-        --bg-input:   #1e293b;
-        --bg-hover:   #14532d22;
-        --bg-active:  #166534;
-        --border:     #334155;
-        --border-sub: #1e293b;
-        --text:       #f1f5f9;
-        --text-muted: #94a3b8;
-        --text-faint: #64748b;
-        --shadow:     rgba(0,0,0,.35);
-        --bubble-user: #166534;
-        --bubble-ai:   #1e3a5f;
-        --avatar-user-bg: #166534; --avatar-user-fg: #86efac;
-        --avatar-ai-bg:   #1e3a5f; --avatar-ai-fg:   #93c5fd;
-        --btn-sec-bg: #1e293b; --btn-sec-fg: #94a3b8;
-        --btn-sec-hover: #334155;
-        --btn-danger-bg: #450a0a; --btn-danger-fg: #fca5a5;
-        --btn-danger-hover: #7f1d1d;
-        --toast-bg: #334155;
-      }
-      html { background: var(--bg-page); color: var(--text); }
+      /* ════════════════════════════════════════════════
+         WINDOWS 98 THEME  —  Staffable HR Admin
+         ════════════════════════════════════════════════ */
       * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body {
+        font-family: "MS Sans Serif", "Tahoma", "Arial", sans-serif;
+        font-size: 11px;
+        background: #008080;
+        color: #000;
+        min-height: 100vh;
+      }
+      body { display: flex; flex-direction: column; padding-bottom: 28px; }
 
-      /* ── Layout ── */
-      body { display: flex; flex-direction: column; min-height: 100vh; background: var(--bg-page); color: var(--text); transition: background .2s, color .2s; }
-
+      /* ── Header ── */
       header {
-        background: #16a34a;
-        color: #fff;
-        padding: 14px 28px;
+        background: #c0c0c0;
+        border-bottom: 2px solid #808080;
+        padding: 3px 4px;
         display: flex;
         align-items: center;
-        gap: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,.15);
+        gap: 4px;
+        position: sticky; top: 0; z-index: 100;
       }
-      header h1 { font-size: 18px; font-weight: 700; flex: 1; }
-      header a {
-        color: rgba(255,255,255,.85);
-        text-decoration: none;
-        font-size: 13px;
-        padding: 6px 12px;
-        border: 1px solid rgba(255,255,255,.4);
-        border-radius: 6px;
-      }
-      header a:hover { background: rgba(255,255,255,.15); }
-
-      /* Dark mode toggle button in header */
-      #themeToggle {
-        background: rgba(255,255,255,.15);
-        border: 1px solid rgba(255,255,255,.4);
+      .titlebar {
+        background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
         color: #fff;
-        font-size: 16px;
-        width: 34px; height: 34px;
-        border-radius: 8px;
-        cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        transition: background .15s;
-        flex-shrink: 0;
+        font-weight: bold;
+        font-size: 11px;
+        padding: 2px 6px;
+        display: flex; align-items: center; gap: 6px;
+        flex: 1; min-width: 0;
       }
-      #themeToggle:hover { background: rgba(255,255,255,.28); }
+      .titlebar h1 { font-size: 11px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      header > a {
+        background: #c0c0c0; color: #000; text-decoration: none;
+        font-size: 11px; padding: 2px 8px; white-space: nowrap;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+      }
+      header > a:active { border-top: 2px solid #404040; border-left: 2px solid #404040; border-right: 2px solid #fff; border-bottom: 2px solid #fff; }
+      #themeToggle {
+        background: #c0c0c0; color: #000; font-size: 13px;
+        padding: 1px 6px; cursor: pointer; font-family: inherit;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+      }
+      #themeToggle:active { border-top: 2px solid #404040; border-left: 2px solid #404040; border-right: 2px solid #fff; border-bottom: 2px solid #fff; }
 
-      main { flex: 1; padding: 28px; max-width: 1400px; width: 100%; margin: 0 auto; }
+      /* ── Main ── */
+      main { flex: 1; padding: 10px; max-width: 1400px; width: 100%; margin: 0 auto; }
 
       /* ── Stat cards ── */
-      .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 16px;
-        margin-bottom: 28px;
-      }
+      .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-bottom: 8px; }
       .stat-card {
-        background: var(--bg-card);
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 8px var(--shadow);
-        transition: background .2s;
+        background: #c0c0c0; padding: 6px 10px 8px;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
       }
-      .stat-card .label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .05em; }
-      .stat-card .value { font-size: 28px; font-weight: 700; color: #16a34a; }
-      .stat-card .sub   { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+      .stat-card .label { font-size: 10px; color: #000080; font-weight: bold; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .03em; }
+      .stat-card .value { font-size: 26px; font-weight: bold; color: #000080; line-height: 1; }
+      .stat-card .sub   { font-size: 10px; color: #444; margin-top: 3px; }
 
       /* ── Controls bar ── */
       .controls {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
-        background: var(--bg-card);
-        padding: 14px 18px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px var(--shadow);
-        transition: background .2s;
+        display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+        margin-bottom: 8px; background: #c0c0c0; padding: 6px 8px;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
       }
-      .controls label { font-size: 13px; color: var(--text-muted); white-space: nowrap; }
-      .controls input, .controls select {
-        padding: 7px 12px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 13px;
-        outline: none;
-        flex: 1;
-        min-width: 160px;
-        background: var(--bg-input);
-        color: var(--text);
-        transition: background .2s, border-color .15s;
+      .controls label { font-size: 11px; color: #000; white-space: nowrap; }
+      .controls input {
+        padding: 2px 4px; background: #fff; font-family: inherit; font-size: 11px;
+        flex: 1; min-width: 140px; outline: none; color: #000;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
       }
-      .controls input:focus, .controls select:focus { border-color: #16a34a; }
+      .controls input:focus { outline: 1px dotted #000080; }
       .controls button {
-        padding: 7px 16px;
-        border: none;
-        border-radius: 8px;
-        font-size: 13px;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: background .15s;
+        padding: 3px 10px; background: #c0c0c0; font-family: inherit;
+        font-size: 11px; cursor: pointer; white-space: nowrap; color: #000;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
       }
-      .btn-primary   { background: #16a34a; color: #fff; }
-      .btn-primary:hover { background: #15803d; }
-      .btn-danger    { background: var(--btn-danger-bg); color: var(--btn-danger-fg); }
-      .btn-danger:hover  { background: var(--btn-danger-hover); }
-      .btn-secondary { background: var(--btn-sec-bg); color: var(--btn-sec-fg); }
-      .btn-secondary:hover { background: var(--btn-sec-hover); }
+      .controls button:active {
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+        padding: 4px 9px 2px 11px;
+      }
+      .btn-primary   { font-weight: bold; }
+      .btn-danger    { color: #800000; font-weight: bold; }
+      .btn-secondary { color: #000; }
 
-      /* ── User list panel ── */
-      .layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; }
+      /* ── Layout ── */
+      .layout { display: grid; grid-template-columns: 220px 1fr; gap: 8px; }
       @media (max-width: 700px) { .layout { grid-template-columns: 1fr; } }
 
+      /* ── User panel ── */
       .user-panel {
-        background: var(--bg-card);
-        border-radius: 12px;
-        box-shadow: 0 2px 8px var(--shadow);
-        overflow: hidden;
-        align-self: start;
-        transition: background .2s;
+        background: #c0c0c0; align-self: start;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
       }
       .user-panel h2 {
-        font-size: 13px;
-        padding: 14px 16px;
-        border-bottom: 1px solid var(--border-sub);
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: .05em;
+        background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+        color: #fff; font-size: 11px; font-weight: bold; padding: 2px 6px;
       }
-      .user-list { max-height: 520px; overflow-y: auto; }
+      .user-list {
+        max-height: 520px; overflow-y: auto; background: #fff; margin: 4px;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      }
       .user-item {
-        padding: 12px 16px;
-        cursor: pointer;
-        border-bottom: 1px solid var(--border-sub);
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        transition: background .1s;
+        padding: 4px 6px; cursor: default;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex; flex-direction: column; gap: 1px;
       }
-      .user-item:hover    { background: var(--bg-hover); }
-      .user-item.active   { background: var(--bg-active); border-left: 3px solid #16a34a; }
-      .user-item .phone   { font-size: 13px; font-weight: 600; }
-      .user-item .meta    { font-size: 11px; color: var(--text-faint); }
+      .user-item:hover, .user-item.active              { background: #000080; color: #fff; }
+      .user-item:hover .meta, .user-item.active .meta  { color: #c0c0c0; }
+      .user-item .phone { font-size: 11px; font-weight: bold; }
+      .user-item .meta  { font-size: 10px; color: #555; }
 
-      /* ── Conversation panel ── */
+      /* ── Convo panel ── */
       .convo-panel {
-        background: var(--bg-card);
-        border-radius: 12px;
-        box-shadow: 0 2px 8px var(--shadow);
-        display: flex;
-        flex-direction: column;
-        min-height: 400px;
-        transition: background .2s;
+        background: #c0c0c0; display: flex; flex-direction: column; min-height: 400px;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
       }
       .convo-header {
-        padding: 14px 18px;
-        border-bottom: 1px solid var(--border-sub);
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+        padding: 2px 6px; display: flex; align-items: center; gap: 8px;
       }
-      .convo-header h2 { font-size: 14px; flex: 1; color: var(--text); }
-      .convo-body { flex: 1; overflow-y: auto; padding: 18px; max-height: 520px; }
-      .convo-empty {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 200px;
-        color: var(--text-faint);
-        font-size: 14px;
+      .convo-header h2 { font-size: 11px; font-weight: bold; flex: 1; color: #fff; }
+      .convo-header button {
+        padding: 1px 8px; background: #c0c0c0; font-family: inherit;
+        font-size: 11px; cursor: pointer; color: #800000; font-weight: bold;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+      }
+      .convo-header button:active {
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      }
+      .convo-body {
+        flex: 1; overflow-y: auto; padding: 8px; max-height: 520px;
+        background: #fff; margin: 4px;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      }
+      .convo-empty { display: flex; align-items: center; justify-content: center; height: 200px; color: #808080; font-size: 11px; }
+
+      /* ── Bubbles ── */
+      .msg-row { display: flex; gap: 6px; margin-bottom: 8px; align-items: flex-start; }
+      .msg-row.user { flex-direction: row-reverse; }
+      .avatar {
+        width: 26px; height: 26px; background: #c0c0c0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 10px; font-weight: bold; flex-shrink: 0;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+      }
+      .avatar.user      { color: #000080; }
+      .avatar.assistant { color: #800000; }
+      .bubble {
+        max-width: 75%; padding: 4px 8px; font-size: 11px; line-height: 1.5; color: #000;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      }
+      .bubble.user      { background: #ffffcc; }
+      .bubble.assistant { background: #f0f0f0; }
+      .bubble .ts { font-size: 9px; color: #808080; margin-top: 3px; }
+
+      /* ── Badges ── */
+      .badge {
+        display: inline-block; font-size: 9px; padding: 1px 5px;
+        font-weight: bold; margin-top: 3px;
+        border-top: 1px solid #fff; border-left: 1px solid #fff;
+        border-right: 1px solid #404040; border-bottom: 1px solid #404040;
+      }
+      .badge.answer_faq             { background: #c0dcc0; color: #004000; }
+      .badge.create_salesforce_task { background: #cce0ff; color: #000080; }
+      .badge.no_action              { background: #ffffc0; color: #804000; }
+
+      /* ── Win98 scrollbars ── */
+      ::-webkit-scrollbar { width: 16px; }
+      ::-webkit-scrollbar-track { background: #c0c0c0; }
+      ::-webkit-scrollbar-thumb {
+        background: #c0c0c0;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+      }
+      ::-webkit-scrollbar-button {
+        background: #c0c0c0; display: block; height: 16px;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
       }
 
-      /* ── Message bubbles ── */
-      .msg-row { display: flex; gap: 10px; margin-bottom: 14px; align-items: flex-start; }
-      .msg-row.user      { flex-direction: row-reverse; }
-      .avatar {
-        width: 30px; height: 30px;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 12px; font-weight: 700; flex-shrink: 0;
+      /* ── Clippy ── */
+      #clippy-wrap {
+        position: fixed; bottom: 36px; right: 16px; z-index: 500;
+        display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+        font-family: "MS Sans Serif", "Tahoma", Arial, sans-serif;
       }
-      .avatar.user      { background: var(--avatar-user-bg); color: var(--avatar-user-fg); }
-      .avatar.assistant { background: var(--avatar-ai-bg);   color: var(--avatar-ai-fg); }
-      .bubble {
-        max-width: 75%;
-        padding: 10px 14px;
-        border-radius: 14px;
-        font-size: 13px;
-        line-height: 1.5;
-        color: var(--text);
+      #clippy-bubble {
+        background: #ffffcc;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+        padding: 6px 10px; font-size: 11px; max-width: 200px;
+        line-height: 1.4; display: none; position: relative;
       }
-      .bubble.user      { background: var(--bubble-user); border-bottom-right-radius: 4px; }
-      .bubble.assistant { background: var(--bubble-ai);   border-bottom-left-radius: 4px; }
-      .bubble .ts    { font-size: 10px; color: var(--text-faint); margin-top: 4px; }
-      .badge {
-        display: inline-block;
-        font-size: 10px;
-        padding: 2px 7px;
-        border-radius: 999px;
-        font-weight: 600;
-        margin-top: 4px;
+      #clippy-bubble.show { display: block; }
+      #clippy-bubble::after {
+        content: '';
+        position: absolute; bottom: -10px; right: 22px;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 10px solid #404040;
       }
-      .badge.answer_faq           { background: #dcfce7; color: #16a34a; }
-      .badge.create_salesforce_task { background: #eff6ff; color: #3b82f6; }
-      .badge.no_action            { background: #fef3c7; color: #d97706; }
+      #clippy-bubble::before {
+        content: '';
+        position: absolute; bottom: -8px; right: 23px;
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+        border-top: 9px solid #ffffcc;
+        z-index: 1;
+      }
+      #clippy-close {
+        position: absolute; top: 2px; right: 4px;
+        font-size: 9px; cursor: pointer; color: #000080; font-weight: bold;
+      }
+      #clippy-svg {
+        width: 60px; height: 60px; cursor: pointer;
+        filter: drop-shadow(1px 1px 0 #404040);
+        transition: transform .1s;
+      }
+      #clippy-svg:hover { transform: scale(1.08); }
+      #clippy-svg:active { transform: scale(0.95); }
+      @keyframes clippy-bounce {
+        0%,100% { transform: translateY(0); }
+        50%      { transform: translateY(-4px); }
+      }
+      #clippy-svg.bounce { animation: clippy-bounce .4s ease 2; }
 
       /* ── Toast ── */
       #toast {
-        position: fixed; bottom: 24px; right: 24px;
-        background: var(--toast-bg); color: #fff;
-        padding: 10px 18px; border-radius: 8px;
-        font-size: 13px; opacity: 0;
-        transition: opacity .25s;
-        pointer-events: none;
-        z-index: 999;
+        position: fixed; bottom: 40px; right: 12px; background: #ffffcc;
+        color: #000; padding: 4px 10px; font-size: 11px; opacity: 0;
+        transition: opacity .2s; pointer-events: none; z-index: 999;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
       }
       #toast.show { opacity: 1; }
+
+      /* ── Status bar ── */
+      .statusbar {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: #c0c0c0; border-top: 2px solid #fff;
+        padding: 2px 8px; font-size: 10px;
+        display: flex; align-items: center; gap: 8px; z-index: 100;
+      }
+      .statusbar .start-btn {
+        background: #c0c0c0; font-weight: bold; font-size: 11px;
+        cursor: default; display: flex; align-items: center; gap: 4px;
+        padding: 2px 10px;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+      }
+      .statusbar .status-text {
+        font-size: 10px; color: #444; flex: 1;
+        border-top: 1px solid #808080; border-left: 1px solid #808080;
+        padding: 1px 6px;
+      }
+      .statusbar .clock {
+        margin-left: auto; padding: 2px 8px; font-size: 10px; min-width: 55px; text-align: center;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      }
     </style>
   </head>
   <body>
+
     <header>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      <h1>Staffable HR Agent — Admin</h1>
+      <div class="titlebar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <h1>Staffable HR Agent — Admin</h1>
+      </div>
       <a href="/local.html">💬 Emulator</a>
-      <button id="themeToggle" title="Dark/light mode" onclick="toggleTheme()">🌙</button>
+      <button id="themeToggle" title="Kleurenschema wisselen" onclick="toggleTheme()">🌙</button>
     </header>
 
     <main>
-      <!-- Stat cards -->
       <div class="stat-grid">
         <div class="stat-card">
           <div class="label">Totaal berichten</div>
@@ -298,7 +318,6 @@
         </div>
       </div>
 
-      <!-- Controls -->
       <div class="controls">
         <label>Filter op nummer:</label>
         <input id="filterPhone" type="text" placeholder="+316…" />
@@ -308,21 +327,17 @@
         <button class="btn-secondary" onclick="loadAll()">↻ Vernieuwen</button>
       </div>
 
-      <!-- Two-column layout -->
       <div class="layout">
-        <!-- User list -->
         <div class="user-panel">
-          <h2>Gebruikers</h2>
+          <h2>📋 Gebruikers</h2>
           <div class="user-list" id="userList">
             <div class="convo-empty">Laden…</div>
           </div>
         </div>
-
-        <!-- Conversation viewer -->
         <div class="convo-panel">
           <div class="convo-header">
-            <h2 id="convoTitle">Selecteer een gebruiker</h2>
-            <button class="btn-danger" id="clearBtn" style="display:none" onclick="clearConvo()">🗑 Wis gesprek</button>
+            <h2 id="convoTitle">💬 Selecteer een gebruiker</h2>
+            <button id="clearBtn" style="display:none" onclick="clearConvo()">🗑 Wis gesprek</button>
           </div>
           <div class="convo-body" id="convoBody">
             <div class="convo-empty">👈 Kies een gebruiker uit de lijst</div>
@@ -331,28 +346,70 @@
       </div>
     </main>
 
+    <div class="statusbar">
+      <div class="start-btn">🪟 Start</div>
+      <div class="status-text" id="statusText">Gereed</div>
+      <div class="clock" id="clock">--:--</div>
+    </div>
+
     <div id="toast"></div>
 
+    <!-- ── Clippy ── -->
+    <div id="clippy-wrap">
+      <div id="clippy-bubble">
+        <span id="clippy-close" onclick="clippyDismiss()">✕</span>
+        <span id="clippy-msg">Het lijkt erop dat u gesprekken aan het bekijken bent. Wilt u hulp?</span>
+      </div>
+      <!-- Clippy SVG — classic paperclip assistant -->
+      <svg id="clippy-svg" onclick="clippyClick()" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" title="Clippy">
+        <!-- Body / paperclip shape -->
+        <path d="M30 4 C20 4 13 11 13 21 L13 44 C13 51 18 56 25 56 C32 56 37 51 37 44 L37 22 C37 18 34 15 30 15 C26 15 23 18 23 22 L23 42 C23 43.6 24.4 45 26 45 C27.6 45 29 43.6 29 42 L29 22" 
+              fill="none" stroke="#c0a000" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Eyes -->
+        <ellipse cx="26" cy="26" rx="2" ry="2.5" fill="#000080"/>
+        <ellipse cx="34" cy="26" rx="2" ry="2.5" fill="#000080"/>
+        <!-- Pupils -->
+        <ellipse cx="26.5" cy="26.5" rx="0.8" ry="0.8" fill="#fff"/>
+        <ellipse cx="34.5" cy="26.5" rx="0.8" ry="0.8" fill="#fff"/>
+        <!-- Eyebrows -->
+        <path d="M23.5 23 Q26 21.5 28.5 23" fill="none" stroke="#000080" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M31.5 23 Q34 21.5 36.5 23" fill="none" stroke="#000080" stroke-width="1.2" stroke-linecap="round"/>
+        <!-- Mouth (smile) -->
+        <path d="M25 31 Q30 35 35 31" fill="none" stroke="#000080" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Hands / arms -->
+        <line x1="18" y1="34" x2="12" y2="38" stroke="#c0a000" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="42" y1="34" x2="48" y2="38" stroke="#c0a000" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Feet -->
+        <line x1="22" y1="54" x2="18" y2="58" stroke="#c0a000" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="38" y1="54" x2="42" y2="58" stroke="#c0a000" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+
     <script>
-      // ── State ─────────────────────────────────────────────────────
-      let allUsers   = [];   // [{ phone, count, last }]
+      let allUsers    = [];
       let activePhone = null;
 
-      // ── Boot ──────────────────────────────────────────────────────
       loadAll();
-      setInterval(loadAll, 15000); // auto-refresh every 15 s
+      setInterval(loadAll, 15000);
+      setInterval(updateClock, 1000);
+      updateClock();
 
       async function loadAll() {
         await Promise.all([loadStats(), loadUsers()]);
       }
 
-      // ── Stats ─────────────────────────────────────────────────────
+      function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').textContent =
+          now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+      }
+
       async function loadStats() {
         try {
           const d = await fetchJSON('/conversation/stats');
-          document.getElementById('statTotal').textContent     = d.total_messages ?? '—';
-          document.getElementById('statUsers').textContent     = d.unique_users ?? '—';
-          document.getElementById('statUserMsgs').textContent  = d.user_messages ?? '—';
+          document.getElementById('statTotal').textContent    = d.total_messages ?? '—';
+          document.getElementById('statUsers').textContent    = d.unique_users ?? '—';
+          document.getElementById('statUserMsgs').textContent = d.user_messages ?? '—';
           if (d.last_activity) {
             const dt = new Date(d.last_activity);
             document.getElementById('statLast').textContent    = dt.toLocaleTimeString('nl-NL', { hour:'2-digit', minute:'2-digit' });
@@ -361,17 +418,13 @@
         } catch(e) { console.error('stats error', e); }
       }
 
-      // ── User list — built from history endpoint per known phone ───
-      // We query /conversation/stats for counts and derive users from
-      // individual history calls seeded by fetching all phones via a
-      // small internal helper endpoint we add below.
       async function loadUsers() {
         try {
           const d = await fetchJSON('/conversation/users');
           allUsers = d.users || [];
           renderUserList(allUsers);
+          document.getElementById('statusText').textContent = allUsers.length + ' gebruiker(s) geladen';
         } catch(e) {
-          // Fallback: show empty state
           document.getElementById('userList').innerHTML =
             '<div class="convo-empty" style="padding:20px">Geen gebruikers gevonden</div>';
         }
@@ -380,13 +433,11 @@
       function renderUserList(users) {
         const filter = document.getElementById('filterPhone').value.trim().toLowerCase();
         const list   = filter ? users.filter(u => u.phone.toLowerCase().includes(filter)) : users;
-
         if (!list.length) {
           document.getElementById('userList').innerHTML =
             '<div class="convo-empty" style="padding:20px">Geen resultaten</div>';
           return;
         }
-
         document.getElementById('userList').innerHTML = list.map(u => `
           <div class="user-item ${u.phone === activePhone ? 'active' : ''}"
                onclick="selectUser('${u.phone}')">
@@ -396,86 +447,68 @@
         `).join('');
       }
 
-      // ── Conversation viewer ───────────────────────────────────────
       async function selectUser(phone) {
         activePhone = phone;
         renderUserList(allUsers);
-        document.getElementById('convoTitle').textContent = phone;
+        document.getElementById('convoTitle').textContent = '💬 ' + phone;
         document.getElementById('clearBtn').style.display = 'inline-block';
         document.getElementById('convoBody').innerHTML    = '<div class="convo-empty">Laden…</div>';
-
+        document.getElementById('statusText').textContent = 'Gesprek laden voor ' + phone + '…';
         try {
-          const d = await fetchJSON(`/conversation/history?phone=${encodeURIComponent(phone)}&limit=100`);
+          const d = await fetchJSON('/conversation/history?phone=' + encodeURIComponent(phone) + '&limit=100');
           renderConvo(d.messages || []);
+          document.getElementById('statusText').textContent = (d.messages||[]).length + ' berichten voor ' + phone;
         } catch(e) {
-          document.getElementById('convoBody').innerHTML =
-            '<div class="convo-empty">Fout bij laden</div>';
+          document.getElementById('convoBody').innerHTML = '<div class="convo-empty">Fout bij laden</div>';
         }
       }
 
       function renderConvo(messages) {
         if (!messages.length) {
-          document.getElementById('convoBody').innerHTML =
-            '<div class="convo-empty">Geen berichten</div>';
+          document.getElementById('convoBody').innerHTML = '<div class="convo-empty">Geen berichten</div>';
           return;
         }
-
         document.getElementById('convoBody').innerHTML = messages.map(m => {
           const isUser = m.role === 'user';
           const initials = isUser ? 'G' : 'AI';
           const ts = m.created_at ? new Date(m.created_at).toLocaleString('nl-NL') : '';
           const badge = (!isUser && m.action)
-            ? `<div><span class="badge ${m.action}">${m.action}</span></div>` : '';
-
-          return `
-            <div class="msg-row ${m.role}">
-              <div class="avatar ${m.role}">${initials}</div>
-              <div class="bubble ${m.role}">
-                ${escHtml(m.content)}
-                ${badge}
-                <div class="ts">${ts}</div>
-              </div>
-            </div>`;
+            ? '<div><span class="badge ' + m.action + '">' + m.action + '</span></div>' : '';
+          return '<div class="msg-row ' + m.role + '">' +
+            '<div class="avatar ' + m.role + '">' + initials + '</div>' +
+            '<div class="bubble ' + m.role + '">' + escHtml(m.content) + badge +
+            '<div class="ts">' + ts + '</div></div></div>';
         }).join('');
-
-        // Scroll to bottom
         const body = document.getElementById('convoBody');
         body.scrollTop = body.scrollHeight;
       }
 
-      // ── Clear conversation ────────────────────────────────────────
       async function clearConvo() {
         if (!activePhone) return;
-        if (!confirm(`Weet u zeker dat u het gesprek met ${activePhone} wilt wissen?`)) return;
+        if (!confirm('Weet u zeker dat u het gesprek met ' + activePhone + ' wilt wissen?')) return;
         try {
-          await fetch(`/conversation/reset?phone=${encodeURIComponent(activePhone)}`, { method: 'DELETE' });
+          await fetch('/conversation/reset?phone=' + encodeURIComponent(activePhone), { method: 'DELETE' });
           toast('Gesprek gewist ✓');
           activePhone = null;
-          document.getElementById('convoTitle').textContent   = 'Selecteer een gebruiker';
-          document.getElementById('clearBtn').style.display   = 'none';
-          document.getElementById('convoBody').innerHTML      =
-            '<div class="convo-empty">👈 Kies een gebruiker uit de lijst</div>';
+          document.getElementById('convoTitle').textContent = '💬 Selecteer een gebruiker';
+          document.getElementById('clearBtn').style.display = 'none';
+          document.getElementById('convoBody').innerHTML    = '<div class="convo-empty">👈 Kies een gebruiker uit de lijst</div>';
+          document.getElementById('statusText').textContent = 'Gesprek gewist';
           await loadAll();
         } catch(e) { toast('Fout bij wissen', true); }
       }
 
-      // ── Filter ────────────────────────────────────────────────────
       function applyFilter() { renderUserList(allUsers); }
-      function clearFilter()  {
-        document.getElementById('filterPhone').value = '';
-        renderUserList(allUsers);
-      }
+      function clearFilter()  { document.getElementById('filterPhone').value = ''; renderUserList(allUsers); }
 
-      // ── Helpers ───────────────────────────────────────────────────
       async function fetchJSON(url) {
         const r = await fetch(url);
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
       }
 
-      function escHtml(str = '') {
-        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-                  .replace(/\n/g,'<br>');
+      function escHtml(str) {
+        return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
       }
 
       function relTime(iso) {
@@ -483,53 +516,91 @@
         const diff = Date.now() - new Date(iso).getTime();
         const m = Math.floor(diff / 60000);
         if (m < 1)  return 'zojuist';
-        if (m < 60) return `${m} min geleden`;
+        if (m < 60) return m + ' min geleden';
         const h = Math.floor(m / 60);
-        if (h < 24) return `${h} uur geleden`;
-        return `${Math.floor(h/24)} dag(en) geleden`;
+        if (h < 24) return h + ' uur geleden';
+        return Math.floor(h/24) + ' dag(en) geleden';
       }
 
-      function toast(msg, err = false) {
+      function toast(msg, err) {
         const el = document.getElementById('toast');
         el.textContent = msg;
-        el.style.background = err ? '#dc2626' : '#0f172a';
+        el.style.background = err ? '#ffd0d0' : '#ffffcc';
+        el.style.color = err ? '#800000' : '#000';
         el.classList.add('show');
         setTimeout(() => el.classList.remove('show'), 2800);
       }
 
-      // Enter key in filter input
       document.getElementById('filterPhone')
         .addEventListener('keydown', e => e.key === 'Enter' && applyFilter());
 
-      // ── Dark mode ─────────────────────────────────────────────────
-      const THEME_KEY = 'staffable-admin-theme';
+      // ── Theme cycling (Win98 colour schemes) ──
+      const THEME_KEY = 'staffable-win98-theme';
+      const themes = [
+        { name:'classic', icon:'🎨', bg:'#008080', gradient:'linear-gradient(90deg,#000080,#1084d0)' },
+        { name:'hotdog',  icon:'🌭', bg:'#ff0000', gradient:'linear-gradient(90deg,#800000,#ff8800)' },
+        { name:'night',   icon:'⭐', bg:'#000040', gradient:'linear-gradient(90deg,#000000,#400080)' },
+        { name:'desert',  icon:'🌵', bg:'#808000', gradient:'linear-gradient(90deg,#404000,#c08000)' },
+      ];
+      let themeIdx = 0;
 
-      function applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        document.getElementById('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+      function applyTheme(idx) {
+        const t = themes[idx % themes.length];
+        document.body.style.background = t.bg;
+        document.querySelectorAll('.titlebar, .user-panel h2, .convo-header').forEach(el => {
+          el.style.background = t.gradient;
+        });
+        document.getElementById('themeToggle').textContent = themes[(idx + 1) % themes.length].icon;
+        localStorage.setItem(THEME_KEY, idx);
       }
 
       function toggleTheme() {
-        const current = document.documentElement.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
-        localStorage.setItem(THEME_KEY, next);
-        applyTheme(next);
+        themeIdx = (themeIdx + 1) % themes.length;
+        applyTheme(themeIdx);
       }
 
-      // On load: use saved preference, else respect OS setting
-      (function initTheme() {
-        const saved = localStorage.getItem(THEME_KEY);
-        if (saved) {
-          applyTheme(saved);
-        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          applyTheme('dark');
-        }
-        // Listen for OS-level changes (only when no manual override saved)
-        window.matchMedia('(prefers-color-scheme: dark)')
-          .addEventListener('change', e => {
-            if (!localStorage.getItem(THEME_KEY)) applyTheme(e.matches ? 'dark' : 'light');
-          });
-      })();
+      themeIdx = parseInt(localStorage.getItem(THEME_KEY) || '0', 10);
+      applyTheme(themeIdx);
+
+      // ── Clippy ────────────────────────────────────────────────────
+      const clippyTips = [
+        'Het lijkt erop dat u gesprekken aan het bekijken bent.<br>Wilt u hulp?',
+        'Tip: Klik op een gebruiker om het gesprek te zien!',
+        'Wist u dat u ook op ↻ kunt klikken om te verversen?',
+        'Het lijkt erop dat u een HR-agent aan het beheren bent.<br>Indrukwekkend!',
+        'Tip: Gebruik het filter om snel een nummer te vinden.',
+        'Ik zie dat u de admin pagina gebruikt.<br>Mag ik u helpen?',
+        'U kunt gesprekken wissen met de 🗑 knop.<br>Maar denk goed na!',
+        'Het lijkt erop dat u Windows 98 gebruikt. Goede keuze!',
+      ];
+      let clippyTipIdx = 0;
+      let clippyDismissed = false;
+
+      function clippyShow(msg) {
+        document.getElementById('clippy-msg').innerHTML = msg;
+        document.getElementById('clippy-bubble').classList.add('show');
+        const svg = document.getElementById('clippy-svg');
+        svg.classList.remove('bounce');
+        void svg.offsetWidth; // reflow to restart animation
+        svg.classList.add('bounce');
+      }
+
+      function clippyDismiss() {
+        document.getElementById('clippy-bubble').classList.remove('show');
+      }
+
+      function clippyClick() {
+        clippyTipIdx = (clippyTipIdx + 1) % clippyTips.length;
+        clippyShow(clippyTips[clippyTipIdx]);
+      }
+
+      // Show greeting after 1.5s
+      setTimeout(() => clippyShow(clippyTips[0]), 1500);
+      // Random tip every 45s
+      setInterval(() => {
+        clippyTipIdx = (clippyTipIdx + 1) % clippyTips.length;
+        clippyShow(clippyTips[clippyTipIdx]);
+      }, 45000);
     </script>
   </body>
 </html>
