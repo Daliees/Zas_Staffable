@@ -5,22 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Local WhatsApp HR Chat</title>
     <style>
+      /* ── Tokens ── */
       :root {
         color-scheme: light;
         font-family: "Inter", "Segoe UI", system-ui, sans-serif;
-        background: #f3f4f6;
+
+        --bg-page:      #f3f4f6;
+        --bg-app:       #ffffff;
+        --bg-chat:      linear-gradient(180deg, #f0fdf4 0%, #ffffff 55%);
+        --bg-panel:     #f8fafc;
+        --bg-input:     #ffffff;
+        --bg-bubble-user:  #dcfce7;
+        --bg-bubble-agent: #e2e8f0;
+        --bg-debug:     #ffffff;
+        --bg-tabs:      #e2e8f0;
+        --bg-tab-active:#ffffff;
+        --bg-config:    #ffffff;
+
+        --border-color: #e2e8f0;
+        --input-border: #cbd5f5;
+
+        --text-primary:   #0f172a;
+        --text-secondary: #475569;
+        --text-meta:      #64748b;
+        --text-tab:       #475569;
+        --text-tab-active:#0f172a;
+
+        --shadow-app:  0 12px 32px rgba(15,23,42,0.12);
+        --shadow-tab:  0 4px 12px rgba(15,23,42,0.1);
       }
+
+      :root.dark {
+        color-scheme: dark;
+
+        --bg-page:      #0d1117;
+        --bg-app:       #161b22;
+        --bg-chat:      linear-gradient(180deg, #0d1f17 0%, #161b22 55%);
+        --bg-panel:     #1c2128;
+        --bg-input:     #21262d;
+        --bg-bubble-user:  #1a4731;
+        --bg-bubble-agent: #2d333b;
+        --bg-debug:     #21262d;
+        --bg-tabs:      #2d333b;
+        --bg-tab-active:#373e47;
+        --bg-config:    #21262d;
+
+        --border-color: #30363d;
+        --input-border: #30363d;
+
+        --text-primary:   #e6edf3;
+        --text-secondary: #8b949e;
+        --text-meta:      #6e7681;
+        --text-tab:       #8b949e;
+        --text-tab-active:#e6edf3;
+
+        --shadow-app: 0 12px 32px rgba(0,0,0,0.5);
+        --shadow-tab: 0 4px 12px rgba(0,0,0,0.4);
+      }
+
+      /* ── Base ── */
       body {
         margin: 0;
         display: flex;
         justify-content: center;
         padding: 32px 16px;
+        background: var(--bg-page);
+        transition: background 0.2s;
       }
       .app {
         width: min(900px, 100%);
-        background: #ffffff;
+        background: var(--bg-app);
         border-radius: 16px;
-        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+        box-shadow: var(--shadow-app);
         display: grid;
         grid-template-columns: 1fr 320px;
         gap: 0;
@@ -28,15 +84,16 @@
       }
       .chat {
         padding: 24px;
-        background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 55%);
+        background: var(--bg-chat);
       }
       .chat h1 {
         margin: 0 0 8px 0;
         font-size: 20px;
+        color: var(--text-primary);
       }
       .chat p {
         margin: 0 0 20px 0;
-        color: #475569;
+        color: var(--text-secondary);
       }
       .messages {
         display: flex;
@@ -52,26 +109,27 @@
         border-radius: 16px;
         font-size: 14px;
         line-height: 1.4;
+        color: var(--text-primary);
       }
       .bubble.user {
         align-self: flex-end;
-        background: #dcfce7;
+        background: var(--bg-bubble-user);
         border-bottom-right-radius: 4px;
       }
       .bubble.agent {
         align-self: flex-start;
-        background: #e2e8f0;
+        background: var(--bg-bubble-agent);
         border-bottom-left-radius: 4px;
       }
       .meta {
         font-size: 12px;
-        color: #64748b;
+        color: var(--text-meta);
         margin-top: 4px;
       }
       .panel {
         padding: 24px;
-        border-left: 1px solid #e2e8f0;
-        background: #f8fafc;
+        border-left: 1px solid var(--border-color);
+        background: var(--bg-panel);
       }
       .status-chip {
         display: inline-flex;
@@ -81,8 +139,8 @@
         border-radius: 999px;
         font-size: 12px;
         font-weight: 600;
-        background: #e2e8f0;
-        color: #1e293b;
+        background: var(--bg-tabs);
+        color: var(--text-primary);
         margin-bottom: 12px;
       }
       .status-dot {
@@ -95,12 +153,20 @@
         background: #dcfce7;
         color: #166534;
       }
+      :root.dark .status-chip.ok {
+        background: #0d3320;
+        color: #4ade80;
+      }
       .status-chip.ok .status-dot {
         background: #22c55e;
       }
       .status-chip.warn {
         background: #fef9c3;
         color: #854d0e;
+      }
+      :root.dark .status-chip.warn {
+        background: #2d2200;
+        color: #fbbf24;
       }
       .status-chip.warn .status-dot {
         background: #facc15;
@@ -109,6 +175,10 @@
         background: #fee2e2;
         color: #991b1b;
       }
+      :root.dark .status-chip.error {
+        background: #2d0a0a;
+        color: #f87171;
+      }
       .status-chip.error .status-dot {
         background: #ef4444;
       }
@@ -116,7 +186,7 @@
         display: inline-flex;
         gap: 8px;
         margin-bottom: 16px;
-        background: #e2e8f0;
+        background: var(--bg-tabs);
         border-radius: 999px;
         padding: 4px;
       }
@@ -127,13 +197,13 @@
         border-radius: 999px;
         font-size: 12px;
         font-weight: 600;
-        color: #475569;
+        color: var(--text-tab);
         cursor: pointer;
       }
       .tab.active {
-        background: #ffffff;
-        color: #0f172a;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+        background: var(--bg-tab-active);
+        color: var(--text-tab-active);
+        box-shadow: var(--shadow-tab);
       }
       .tab-content {
         display: none;
@@ -146,16 +216,16 @@
         gap: 12px;
       }
       .debug-block {
-        background: #ffffff;
+        background: var(--bg-debug);
         border-radius: 10px;
         padding: 12px;
         font-size: 12px;
-        color: #475569;
+        color: var(--text-secondary);
       }
       label {
         font-size: 12px;
         font-weight: 600;
-        color: #475569;
+        color: var(--text-secondary);
         display: block;
         margin-bottom: 6px;
       }
@@ -163,12 +233,14 @@
       textarea,
       select {
         width: 100%;
-        border: 1px solid #cbd5f5;
+        border: 1px solid var(--input-border);
         border-radius: 10px;
         padding: 10px 12px;
         font-size: 14px;
         margin-bottom: 14px;
-        background: #ffffff;
+        background: var(--bg-input);
+        color: var(--text-primary);
+        box-sizing: border-box;
       }
       textarea {
         resize: vertical;
@@ -192,27 +264,51 @@
       .status {
         margin-top: 12px;
         font-size: 12px;
-        color: #64748b;
+        color: var(--text-meta);
       }
       .config {
         font-size: 12px;
-        color: #64748b;
-        background: #ffffff;
+        color: var(--text-secondary);
+        background: var(--bg-config);
         border-radius: 10px;
         padding: 12px;
       }
+
+      /* ── Dark mode toggle ── */
+      .dark-toggle {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid var(--border-color);
+        background: var(--bg-app);
+        color: var(--text-primary);
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        box-shadow: var(--shadow-tab);
+        z-index: 100;
+        transition: background 0.2s, border-color 0.2s;
+      }
+
       @media (max-width: 860px) {
         .app {
           grid-template-columns: 1fr;
         }
         .panel {
           border-left: none;
-          border-top: 1px solid #e2e8f0;
+          border-top: 1px solid var(--border-color);
         }
       }
     </style>
   </head>
   <body>
+    <button class="dark-toggle" id="darkToggle" title="Toggle dark mode">🌙</button>
     <div class="app">
       <section class="chat">
         <h1>Local WhatsApp HR Chat</h1>
@@ -439,6 +535,26 @@
       setStatus("Ready to send.");
       loadConfig();
       checkConnection();
+
+      // ── Dark mode ──
+      const darkToggle = document.getElementById("darkToggle");
+
+      function applyTheme(dark) {
+        document.documentElement.classList.toggle("dark", dark);
+        darkToggle.textContent = dark ? "☀️" : "🌙";
+        darkToggle.title = dark ? "Switch to light mode" : "Switch to dark mode";
+      }
+
+      const savedTheme = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(savedTheme === "dark" || (!savedTheme && prefersDark));
+
+      darkToggle.addEventListener("click", () => {
+        const isDark = document.documentElement.classList.toggle("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+        darkToggle.textContent = isDark ? "☀️" : "🌙";
+        darkToggle.title = isDark ? "Switch to light mode" : "Switch to dark mode";
+      });
     </script>
   </body>
 </html>
