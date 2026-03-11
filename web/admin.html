@@ -350,12 +350,12 @@
         <button class="btn-secondary" onclick="clearFilter()">✕ Reset</button>
         <div style="flex:1"></div>
         <!-- Agent mode toggle -->
-        <div class="mode-toggle-wrap" title="Schakel de agent tussen Normaal en FAQ-only modus">
-          <span class="mode-label">Agentmodus:</span>
+        <div class="mode-toggle-wrap" title="Schakel tussen 'Alles beantwoorden' en 'Alleen vaste antwoorden'">
+          <span class="mode-label">Antwoorden:</span>
           <div id="modeTrack" class="mode-toggle-track" onclick="toggleAgentMode()">
             <div class="mode-toggle-thumb"></div>
           </div>
-          <span id="modeStatus" class="mode-status norm">Normaal</span>
+          <span id="modeStatus" class="mode-status norm">Alles</span>
         </div>
         <button class="btn-secondary" onclick="loadAll()">↻ Vernieuwen</button>
       </div>
@@ -447,9 +447,9 @@
           });
           const d = await r.json();
           setModeUI(d.mode);
-          toast(d.mode === 'faq_only' ? '🔒 FAQ-only modus actief' : '✅ Normale modus actief');
+          toast(d.mode === 'faq_only' ? '🔒 Alleen vaste antwoorden actief' : '✅ Alle vragen worden beantwoord');
           document.getElementById('statusText').textContent =
-            'Agentmodus: ' + (d.mode === 'faq_only' ? 'FAQ only' : 'Normaal');
+            'Antwoorden: ' + (d.mode === 'faq_only' ? 'Alleen vaste antwoorden' : 'Alles');
         } catch(e) { toast('Fout bij wisselen van modus', true); }
       }
 
@@ -459,11 +459,11 @@
         const status = document.getElementById('modeStatus');
         if (mode === 'faq_only') {
           track.classList.add('on');
-          status.textContent = 'FAQ only';
+          status.textContent = 'Vaste antwoorden';
           status.className = 'mode-status faq';
         } else {
           track.classList.remove('on');
-          status.textContent = 'Normaal';
+          status.textContent = 'Alles';
           status.className = 'mode-status norm';
         }
       }
