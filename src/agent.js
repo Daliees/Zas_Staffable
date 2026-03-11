@@ -143,6 +143,26 @@ Bij "create_salesforce_task" vul je ook het task-object in (subject, description
 
 ${formatInstructions}`;
 
+// ── FAQ-only mode prompt ──────────────────────────────────────────────────────
+// Used when the admin has switched the agent to "FAQ only" mode.
+// The agent ONLY answers questions that are explicitly covered in the FAQ list.
+// All other questions — even valid HR questions — get a polite "not in FAQ" reply.
+const SYSTEM_PROMPT_FAQ_ONLY = (faq, formatInstructions) =>
+`Je bent een HR-assistent voor WhatsApp-gesprekken van Staffable.
+Je werkt momenteel in FAQ-ONLY modus. Dit betekent:
+- Je beantwoordt UITSLUITEND vragen die letterlijk in de onderstaande FAQ-lijst staan.
+- Als een vraag NIET in de FAQ staat, geef je action "no_action" en verwijs je de medewerker
+  door naar HR: "Uw vraag staat niet in onze FAQ. Neem contact op met HR via hr@staffable.nl."
+- Je maakt GEEN Salesforce-taken aan in deze modus.
+- Je geeft GEEN antwoorden op basis van algemene HR-kennis buiten de FAQ.
+
+Je communiceert altijd formeel (u/uw) in het Nederlands.
+
+FAQ-lijst (enige toegestane bron):
+${faq}
+
+${formatInstructions}`;
+
 const fallbackKeywordIntent = (message) => {
   const normalized = message.toLowerCase();
   const faqMatch = faqCatalog.find((item) =>
@@ -198,7 +218,7 @@ const fallbackKeywordIntent = (message) => {
 /**
  * Run the HR agent.
  * @param {string} message - the current user message
- * @param {object} metadata - extra context (from phone number, etc.)
+ * @param {object} metadata - extra context (from phone number, mode, etc.)
  * @param {{ role: 'user'|'assistant', content: string }[]} [history=[]]
  *   Previous messages for this phone number, oldest first.
  *   Pass the result of db.getHistory(phone) here.
@@ -216,15 +236,22 @@ async function runAgent(message, metadata = {}, history = []) {
     return fallbackKeywordIntent(message);
   }
 
+  const mode = metadata.mode || "normal";
+  const isFaqOnly = mode === "faq_only";
+
   const llm = new ChatOpenAI({
     model: process.env.OPENAI_MODEL || "gpt-4o-mini",
     temperature: 0.2
   });
 
+  const systemPrompt = isFaqOnly
+    ? SYSTEM_PROMPT_FAQ_ONLY(faqText, parser.getFormatInstructions())
+    : SYSTEM_PROMPT(faqText, parser.getFormatInstructions());
+
   // Build the messages array:
   //   [SystemMessage, ...history as Human/AI turns, HumanMessage (current)]
   const messages = [
-    new SystemMessage(SYSTEM_PROMPT(faqText, parser.getFormatInstructions()))
+    new SystemMessage(systemPrompt)
   ];
 
   // Inject previous turns so the LLM has full context

@@ -247,6 +247,31 @@
       }
       #clippy-svg.bounce { animation: clippy-bounce .4s ease 2; }
 
+      /* ── Agent mode toggle ── */
+      .mode-toggle-wrap {
+        display: flex; align-items: center; gap: 6px;
+        background: #c0c0c0; padding: 3px 8px;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      }
+      .mode-toggle-wrap .mode-label { font-size: 10px; font-weight: bold; color: #000080; white-space: nowrap; }
+      .mode-toggle-track {
+        width: 44px; height: 16px; background: #808080; cursor: pointer; position: relative; flex-shrink: 0;
+        border-top: 2px solid #404040; border-left: 2px solid #404040;
+        border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+      }
+      .mode-toggle-track.on { background: #000080; }
+      .mode-toggle-thumb {
+        position: absolute; top: 1px; left: 1px;
+        width: 20px; height: 10px; background: #c0c0c0; transition: left .15s;
+        border-top: 2px solid #fff; border-left: 2px solid #fff;
+        border-right: 2px solid #404040; border-bottom: 2px solid #404040;
+      }
+      .mode-toggle-track.on .mode-toggle-thumb { left: 21px; }
+      .mode-status { font-size: 10px; white-space: nowrap; min-width: 64px; }
+      .mode-status.faq  { color: #004000; font-weight: bold; }
+      .mode-status.norm { color: #444; }
+
       /* ── Toast ── */
       #toast {
         position: fixed; bottom: 40px; right: 12px; background: #ffffcc;
@@ -324,6 +349,14 @@
         <button class="btn-primary" onclick="applyFilter()">🔍 Zoeken</button>
         <button class="btn-secondary" onclick="clearFilter()">✕ Reset</button>
         <div style="flex:1"></div>
+        <!-- Agent mode toggle -->
+        <div class="mode-toggle-wrap" title="Schakel de agent tussen Normaal en FAQ-only modus">
+          <span class="mode-label">Agentmodus:</span>
+          <div id="modeTrack" class="mode-toggle-track" onclick="toggleAgentMode()">
+            <div class="mode-toggle-thumb"></div>
+          </div>
+          <span id="modeStatus" class="mode-status norm">Normaal</span>
+        </div>
         <button class="btn-secondary" onclick="loadAll()">↻ Vernieuwen</button>
       </div>
 
@@ -393,6 +426,49 @@
       setInterval(loadAll, 15000);
       setInterval(updateClock, 1000);
       updateClock();
+
+      // ── Agent mode toggle ─────────────────────────────────────────
+      let currentMode = 'normal';
+
+      async function loadAgentMode() {
+        try {
+          const d = await fetchJSON('/agent-mode');
+          setModeUI(d.mode);
+        } catch(e) { console.error('mode load error', e); }
+      }
+
+      async function toggleAgentMode() {
+        const newMode = currentMode === 'normal' ? 'faq_only' : 'normal';
+        try {
+          const r = await fetch('/agent-mode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode: newMode })
+          });
+          const d = await r.json();
+          setModeUI(d.mode);
+          toast(d.mode === 'faq_only' ? '🔒 FAQ-only modus actief' : '✅ Normale modus actief');
+          document.getElementById('statusText').textContent =
+            'Agentmodus: ' + (d.mode === 'faq_only' ? 'FAQ only' : 'Normaal');
+        } catch(e) { toast('Fout bij wisselen van modus', true); }
+      }
+
+      function setModeUI(mode) {
+        currentMode = mode;
+        const track  = document.getElementById('modeTrack');
+        const status = document.getElementById('modeStatus');
+        if (mode === 'faq_only') {
+          track.classList.add('on');
+          status.textContent = 'FAQ only';
+          status.className = 'mode-status faq';
+        } else {
+          track.classList.remove('on');
+          status.textContent = 'Normaal';
+          status.className = 'mode-status norm';
+        }
+      }
+
+      loadAgentMode();
 
       async function loadAll() {
         await Promise.all([loadStats(), loadUsers()]);

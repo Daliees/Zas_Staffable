@@ -14,6 +14,25 @@ config();
 const app = express();
 app.use(express.json({ limit: "1mb" }));
 
+// ── Agent mode: "normal" | "faq_only" ────────────────────────────
+// "normal"   — full AI reasoning + Salesforce tasks + general HR knowledge
+// "faq_only" — only answers questions matched in the FAQ list, nothing else
+let agentMode = process.env.AGENT_MODE || "normal";
+
+app.get("/agent-mode", (_req, res) => {
+  res.json({ mode: agentMode });
+});
+
+app.post("/agent-mode", (req, res) => {
+  const { mode } = req.body;
+  if (!["normal", "faq_only"].includes(mode)) {
+    return res.status(400).json({ error: "mode must be 'normal' or 'faq_only'" });
+  }
+  agentMode = mode;
+  console.log(`[agent-mode] switched to: ${agentMode}`);
+  res.json({ ok: true, mode: agentMode });
+});
+
 const getNodeRedUrl = () =>
   process.env.NODERED_URL ||
   process.env.FLOWFUSE_WEBHOOK_URL ||
@@ -50,7 +69,7 @@ app.post("/webhook/whatsapp", async (req, res) => {
     console.log(`/webhook/whatsapp history for ${from}: ${history.length} turns`);
 
     // ── Step 2: Run the AI agent with context ─────────────────────
-    const agentResult = await runAgent(message, { from }, history);
+    const agentResult = await runAgent(message, { from, mode: agentMode }, history);
     console.log("/webhook/whatsapp agent result", agentResult);
 
     // ── Step 3: Persist both turns to SQLite ──────────────────────
@@ -112,7 +131,7 @@ app.post("/agent", async (req, res) => {
     console.log("/agent request", { from, message: message.slice(0, 200) });
 
     const history = from ? getHistory(from, Number(process.env.HISTORY_TURNS || 10)) : [];
-    const result = await runAgent(message, { from }, history);
+    const result = await runAgent(message, { from, mode: agentMode }, history);
 
     // NOTE: do NOT save here — /webhook/whatsapp already saved both turns
     // before forwarding to FlowFuse. Saving here would cause duplicates.
